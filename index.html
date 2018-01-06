@@ -20,11 +20,20 @@
     var dx = -1;
     var dy = -2;
 	var ballRadius = 10;
+	var colorOfBall = "#0095DD";
 	
+    function randomHexColor() {
+	    var n = 6, s = '#';
+	    while(n--){
+		    s += (Math.random() * 16 | 0).toString(16);
+	    }
+	    return s;
+    }
+
 	function drawBall() {
 	    ctx.beginPath();
         ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-        ctx.fillStyle = "#0095DD";
+        ctx.fillStyle = colorOfBall;
         ctx.fill();
         ctx.closePath();
 	}
@@ -37,9 +46,11 @@
 		/*Ütközés detektálás: ha elér a canvas széleihez ellentétes irányra váltunk*/
 	    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
             dx = -dx;
+			colorOfBall = randomHexColor();
         }
         if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
             dy = -dy;
+			colorOfBall = randomHexColor();
         }
 	
         x += dx;
