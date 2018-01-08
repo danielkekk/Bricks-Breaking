@@ -23,7 +23,7 @@ var bricks = [];
 for(c=0; c<brickColumnCount; c++) {
     bricks[c] = [];
     for(r=0; r<brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0 };
+         bricks[c][r] = { x: 0, y: 0, status: 1 };
     }
 }
     
@@ -74,15 +74,34 @@ function drawPaddle() {
 function drawBricks() {
     for(c=0; c<brickColumnCount; c++) {
         for(r=0; r<brickRowCount; r++) {
-            var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
-            var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
+			/*Csak akkor rajzoljuk ki a téglát ha még nem lett kilőve*/
+            if(bricks[c][r].status == 1) { 
+                var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+                var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+    }
+}
+
+function collisionDetection() {
+    for(c=0; c<brickColumnCount; c++) {
+        for(r=0; r<brickRowCount; r++) {
+            var b = bricks[c][r];
+			/*Ha a tégla még nem lett eltalálva (status==1) akkor minden téglánál megvizsgáljuk, hogy éppen ütközik-e*/
+            if(b.status == 1) {
+				/*A labda közepét vizsgáljuk, hogy beleesik-e a tégla által elfoglalt területbe*/
+                if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+                    dy = -dy;
+                    b.status = 0;
+                }
+            }
         }
     }
 }
@@ -93,6 +112,7 @@ function draw() {
     drawBricks();
     drawBall();
     drawPaddle();
+	collisionDetection(); //TODO: csak akkor érdemes ellenőrizni ha a labda y értéke egy szint alá megy...
     
     /*Ütközés detektálás: ha elér a canvas széleihez ellentétes irányra váltunk*/
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
