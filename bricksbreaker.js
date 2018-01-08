@@ -26,6 +26,7 @@ for(c=0; c<brickColumnCount; c++) {
          bricks[c][r] = { x: 0, y: 0, status: 1 };
     }
 }
+var score = 0;
     
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -71,6 +72,12 @@ function drawPaddle() {
     ctx.closePath();
 }
 
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Score: "+score, 8, 20);
+}
+
 function drawBricks() {
     for(c=0; c<brickColumnCount; c++) {
         for(r=0; r<brickRowCount; r++) {
@@ -99,7 +106,12 @@ function collisionDetection() {
 				/*A labda közepét vizsgáljuk, hogy beleesik-e a tégla által elfoglalt területbe*/
                 if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
                     dy = -dy;
-                    b.status = 0;
+                    b.status = 0;	
+					score++; //pontszám
+                    if(score == brickRowCount*brickColumnCount) { //ha a pontszám egyenlő a a téglák számával vége a játéknak
+                        alert("YOU WIN, CONGRATULATIONS!");
+                        document.location.reload();
+                    }
                 }
             }
         }
@@ -112,6 +124,7 @@ function draw() {
     drawBricks();
     drawBall();
     drawPaddle();
+	drawScore();
 	collisionDetection(); //TODO: csak akkor érdemes ellenőrizni ha a labda y értéke egy szint alá megy...
     
     /*Ütközés detektálás: ha elér a canvas széleihez ellentétes irányra váltunk*/
