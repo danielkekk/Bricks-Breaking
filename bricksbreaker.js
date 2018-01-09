@@ -2,8 +2,8 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var x = canvas.width/2;
 var y = canvas.height/2;
-var dx = -1;
-var dy = -2;
+var dx = -3;
+var dy = -3;
 var ballRadius = 10;
 var colorOfBall = "#0095DD";
 var paddleHeight = 10;
@@ -27,9 +27,11 @@ for(c=0; c<brickColumnCount; c++) {
     }
 }
 var score = 0;
+var lives = 3;
     
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
 function keyDownHandler(e) {
     if(e.keyCode == 39) {
@@ -39,12 +41,20 @@ function keyDownHandler(e) {
         leftPressed = true;
     }
 }
+
 function keyUpHandler(e) {
     if(e.keyCode == 39) {
         rightPressed = false;
     }
     else if(e.keyCode == 37) {
         leftPressed = false;
+    }
+}
+
+function mouseMoveHandler(e) {
+    var relativeX = e.clientX - canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < canvas.width) {
+        paddleX = relativeX - paddleWidth/2;
     }
 }
 
@@ -76,6 +86,12 @@ function drawScore() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#0095DD";
     ctx.fillText("Score: "+score, 8, 20);
+}
+
+function drawLives() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#0095DD";
+    ctx.fillText("Lives: "+lives, canvas.width-65, 20);
 }
 
 function drawBricks() {
@@ -125,6 +141,7 @@ function draw() {
     drawBall();
     drawPaddle();
 	drawScore();
+	drawLives();
 	collisionDetection(); //TODO: csak akkor érdemes ellenőrizni ha a labda y értéke egy szint alá megy...
     
     /*Ütközés detektálás: ha elér a canvas széleihez ellentétes irányra váltunk*/
@@ -143,8 +160,17 @@ function draw() {
             dy = -dy;
         }
         else {
-            alert("GAME OVER");
-            document.location.reload();
+            lives--;
+            if(lives === 0) {
+                alert("GAME OVER");
+                document.location.reload();
+            } else { //ha nem ment le az össze élet újra beállítjuk a kezdőértékeket, koordinátákat
+                x = canvas.width/2;
+                y = canvas.height-30;
+                dx = 3;
+                dy = -3;
+                paddleX = (canvas.width-paddleWidth)/2;
+            }
         }
     }
     
@@ -158,6 +184,7 @@ function draw() {
 
     x += dx;
     y += dy;
+	requestAnimationFrame(draw);
 }
 
-setInterval(draw, 10);
+draw();
